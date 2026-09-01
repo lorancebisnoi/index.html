@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Video Downloader</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    font-family:Arial,sans-serif;
+}
+
+body{
+    background:#f4f6f9;
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.container{
+    width:95%;
+    max-width:550px;
+    background:white;
+    padding:30px;
+    border-radius:20px;
+    box-shadow:0 10px 30px rgba(0,0,0,.12);
+    text-align:center;
+}
+
+h1{
+    font-size:30px;
+    margin-bottom:10px;
+}
+
+.subtitle{
+    color:#666;
+    margin-bottom:25px;
+}
+
+input{
+    width:100%;
+    padding:16px;
+    border:1px solid #ddd;
+    border-radius:12px;
+    font-size:16px;
+    outline:none;
+}
+
+button{
+    width:100%;
+    margin-top:15px;
+    padding:16px;
+    border:0;
+    border-radius:12px;
+    background:#111;
+    color:white;
+    font-size:17px;
+    cursor:pointer;
+}
+
+button:hover{
+    opacity:.85;
+}
+
+#result{
+    margin-top:20px;
+    padding:15px;
+    border-radius:12px;
+    background:#f1f3f5;
+    display:none;
+}
+
+.platforms{
+    margin-top:25px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+}
+
+.platform{
+    padding:12px;
+    background:#f5f5f5;
+    border-radius:10px;
+    font-weight:bold;
+}
+
+.note{
+    margin-top:20px;
+    font-size:12px;
+    color:#777;
+    line-height:1.5;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>🎬 Video Downloader</h1>
+
+    <div class="subtitle">
+        Video URL यहाँ paste करें
+    </div>
+
+    <input
+        type="url"
+        id="videoUrl"
+        placeholder="https://..."
+    >
+
+    <button onclick="checkVideo()">
+        🔍 Check Video
+    </button>
+
+    <div id="result"></div>
+
+    <div class="platforms">
+        <div class="platform">▶️ YouTube</div>
+        <div class="platform">📺 Bilibili</div>
+        <div class="platform">📘 Facebook</div>
+        <div class="platform">📸 Instagram</div>
+    </div>
+
+    <div class="note">
+        केवल उन्हीं videos को डाउनलोड करें जिन्हें डाउनलोड करने की
+        आपको अनुमति है। Private, DRM या protected content को bypass
+        नहीं किया जाता।
+    </div>
+
+</div>
+
+<script>
+
+function checkVideo(){
+
+    const url =
+        document.getElementById("videoUrl").value.trim();
+
+    const result =
+        document.getElementById("result");
+
+    if(!url){
+        result.style.display="block";
+        result.innerHTML="❌ कृपया video URL डालें।";
+        return;
+    }
+
+    let platform="Unknown";
+
+    if(url.includes("youtube.com") || url.includes("youtu.be")){
+        platform="YouTube";
+    }
+    else if(url.includes("bilibili.com")){
+        platform="Bilibili";
+    }
+    else if(url.includes("facebook.com") || url.includes("fb.watch")){
+        platform="Facebook";
+    }
+    else if(url.includes("instagram.com")){
+        platform="Instagram";
+    }
+
+    result.style.display="block";
+
+    if(platform === "Unknown"){
+        result.innerHTML =
+            "❌ यह supported platform का URL नहीं लगता।";
+        return;
+    }
+
+    result.innerHTML =
+        "✅ Platform: <b>" + platform + "</b><br><br>" +
+        "URL मिल गया। अब अनुमत download source/API से " +
+        "video उपलब्ध कराया जा सकता है।";
+}
+
+</script>
+
+</body>
+</html>
