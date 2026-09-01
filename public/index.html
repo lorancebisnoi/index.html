@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YouTube Video Downloader</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+      text-align: center;
+      padding: 40px 15px;
+    }
+
+    .box {
+      max-width: 500px;
+      margin: auto;
+      background: white;
+      padding: 25px;
+      border-radius: 15px;
+      box-shadow: 0 5px 20px #ccc;
+    }
+
+    input {
+      width: 90%;
+      padding: 14px;
+      margin: 15px 0;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+
+    button {
+      padding: 13px 25px;
+      border: 0;
+      border-radius: 8px;
+      background: #e62117;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    #message {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="box">
+  <h1>YouTube Downloader</h1>
+
+  <p>YouTube Video / Shorts URL डालें</p>
+
+  <input
+    type="url"
+    id="url"
+    placeholder="https://www.youtube.com/shorts/..."
+  >
+
+  <br>
+
+  <button onclick="downloadVideo()">Download</button>
+
+  <div id="message"></div>
+</div>
+
+<script>
+async function downloadVideo() {
+  const url = document.getElementById("url").value;
+  const message = document.getElementById("message");
+
+  if (!url) {
+    message.innerHTML = "कृपया YouTube URL डालें।";
+    return;
+  }
+
+  message.innerHTML = "Processing...";
+
+  try {
+    const response = await fetch("http://localhost:5000/download", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ url: url })
+    });
+
+    if (!response.ok) {
+      throw new Error("Download failed");
+    }
+
+    const blob = await response.blob();
+
+    const downloadUrl = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+
+    a.href = downloadUrl;
+    a.download = "video.mp4";
+    document.body.appendChild(a);
+    a.click();
+
+    a.remove();
+    window.URL.revokeObjectURL(downloadUrl);
+
+    message.innerHTML = "Download शुरू हो गया।";
+
+  } catch (error) {
+    message.innerHTML =
+      "Error: Backend server चालू है या नहीं, check करें।";
+  }
+}
+</script>
+
+</body>
+</html>
