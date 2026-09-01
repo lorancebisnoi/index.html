@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Video Downloader</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,sans-serif;
+}
+
+body{
+    min-height:100vh;
+    background:linear-gradient(135deg,#111827,#374151);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+}
+
+.app{
+    width:100%;
+    max-width:550px;
+    background:#fff;
+    border-radius:24px;
+    padding:28px 22px;
+    box-shadow:0 15px 40px rgba(0,0,0,.3);
+}
+
+.logo{
+    text-align:center;
+    font-size:42px;
+}
+
+h1{
+    text-align:center;
+    margin-top:8px;
+    font-size:28px;
+}
+
+.subtitle{
+    text-align:center;
+    color:#6b7280;
+    margin:8px 0 25px;
+}
+
+.input-box{
+    display:flex;
+    gap:8px;
+    background:#f3f4f6;
+    padding:7px;
+    border-radius:14px;
+}
+
+input{
+    flex:1;
+    border:0;
+    outline:0;
+    background:transparent;
+    padding:12px;
+    font-size:15px;
+    min-width:0;
+}
+
+.paste{
+    border:0;
+    background:#e5e7eb;
+    padding:0 12px;
+    border-radius:10px;
+    cursor:pointer;
+}
+
+.download{
+    width:100%;
+    margin-top:14px;
+    padding:15px;
+    border:0;
+    border-radius:14px;
+    background:#111827;
+    color:white;
+    font-size:17px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.download:active{
+    transform:scale(.98);
+}
+
+.platforms{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin-top:22px;
+}
+
+.platform{
+    background:#f9fafb;
+    border:1px solid #e5e7eb;
+    border-radius:12px;
+    padding:14px;
+    text-align:center;
+    font-weight:bold;
+}
+
+.result{
+    display:none;
+    margin-top:18px;
+    padding:15px;
+    background:#f3f4f6;
+    border-radius:12px;
+    line-height:1.6;
+}
+
+.progress{
+    display:none;
+    margin-top:15px;
+}
+
+.progress-bar{
+    height:10px;
+    background:#e5e7eb;
+    border-radius:10px;
+    overflow:hidden;
+}
+
+.progress-fill{
+    width:0%;
+    height:100%;
+    background:#111827;
+    transition:.3s;
+}
+
+.note{
+    margin-top:22px;
+    text-align:center;
+    font-size:12px;
+    color:#6b7280;
+    line-height:1.5;
+}
+
+@media(max-width:400px){
+    .app{
+        padding:22px 16px;
+    }
+
+    h1{
+        font-size:24px;
+    }
+
+    .paste{
+        padding:0 8px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <div class="logo">🎬</div>
+
+    <h1>Video Downloader</h1>
+
+    <p class="subtitle">
+        Video link paste करें
+    </p>
+
+    <div class="input-box">
+
+        <input
+            id="url"
+            type="url"
+            placeholder="YouTube / Bilibili / Facebook / Instagram"
+        >
+
+        <button class="paste" onclick="pasteURL()">
+            Paste
+        </button>
+
+    </div>
+
+    <button class="download" onclick="checkVideo()">
+        ⬇️ Download Video
+    </button>
+
+    <div id="result" class="result"></div>
+
+    <div id="progress" class="progress">
+
+        <div class="progress-bar">
+            <div id="fill" class="progress-fill"></div>
+        </div>
+
+        <p id="percent" style="text-align:center;margin-top:8px;">
+            0%
+        </p>
+
+    </div>
+
+    <div class="platforms">
+
+        <div class="platform">▶️ YouTube</div>
+
+        <div class="platform">📺 Bilibili</div>
+
+        <div class="platform">📘 Facebook</div>
+
+        <div class="platform">📸 Instagram</div>
+
+    </div>
+
+    <p class="note">
+        केवल उन्हीं videos को डाउनलोड करें जिनके लिए आपके पास
+        अनुमति है। Private, DRM या protected content को bypass
+        नहीं किया जाता।
+    </p>
+
+</div>
+
+
+<script>
+
+async function pasteURL(){
+
+    try{
+
+        const text = await navigator.clipboard.readText();
+
+        document.getElementById("url").value = text;
+
+    }catch(error){
+
+        alert("Clipboard access की अनुमति नहीं मिली। URL manually paste करें।");
+
+    }
+
+}
+
+
+function detectPlatform(url){
+
+    if(
+        url.includes("youtube.com") ||
+        url.includes("youtu.be")
+    ){
+        return "YouTube";
+    }
+
+    if(url.includes("bilibili.com")){
+        return "Bilibili";
+    }
+
+    if(
+        url.includes("facebook.com") ||
+        url.includes("fb.watch")
+    ){
+        return "Facebook";
+    }
+
+    if(url.includes("instagram.com")){
+        return "Instagram";
+    }
+
+    return null;
+}
+
+
+function checkVideo(){
+
+    const url =
+        document.getElementById("url").value.trim();
+
+    const result =
+        document.getElementById("result");
+
+    const progress =
+        document.getElementById("progress");
+
+    if(!url){
+
+        result.style.display="block";
+
+        result.innerHTML =
+        "❌ पहले video URL डालें।";
+
+        return;
+    }
+
+
+    let platform = detectPlatform(url);
+
+
+    if(!platform){
+
+        result.style.display="block";
+
+        result.innerHTML =
+        "❌ Supported platform नहीं मिला।<br>" +
+        "YouTube, Bilibili, Facebook या Instagram URL डालें।";
+
+        return;
+    }
+
+
+    result.style.display="block";
+
+    result.innerHTML =
+    "✅ Platform: <b>" + platform + "</b><br>" +
+    "🔗 URL detected successfully.<br><br>" +
+    "⚠️ Actual download के लिए permitted backend/API जोड़ना आवश्यक है।";
+
+
+    progress.style.display="block";
+
+    simulateProgress();
+
+}
+
+
+function simulateProgress(){
+
+    let value=0;
+
+    const fill =
+        document.getElementById("fill");
+
+    const percent =
+        document.getElementById("percent");
+
+    const timer=setInterval(function(){
+
+        value += 10;
+
+        if(value>=100){
+
+            value=100;
+
+            clearInterval(timer);
+
+        }
+
+        fill.style.width=value+"%";
+
+        percent.innerText=value+"%";
+
+    },150);
+
+}
+
+</script>
+
+</body>
+</html>
